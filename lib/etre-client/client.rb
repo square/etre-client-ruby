@@ -10,14 +10,10 @@ module Etre
     META_LABEL_ID = "_id"
     META_LABEL_TYPE = "_type"
 
-    def initialize(entity_type:, url:, ssl_cert: nil, ssl_key: nil, ssl_ca: nil, insecure: true)
+    def initialize(entity_type:, url:, options: {})
       @entity_type = entity_type
       @url = url
-
-      @ssl_cert = ssl_cert
-      @ssl_key = ssl_key
-      @ssl_ca = ssl_ca
-      @insecure = insecure
+      @options = options
     end
 
     # query returns an array of entities that satisfy a query.
@@ -282,21 +278,10 @@ module Etre
     end
 
     def resource_for_route(route)
-      opts = {}
-      opts.merge!(ssl_options) unless @insecure
       RestClient::Resource.new(
         @url + API_ROOT + route,
-        opts
+        @options
       )
-    end
-
-    def ssl_options
-      {
-        :ssl_client_cert => OpenSSL::X509::Certificate.new(File.read(@ssl_cert)),
-        :ssl_client_key  => OpenSSL::PKey::RSA.new(File.read(@ssl_key)),
-        :ssl_ca_file     => @ssl_ca,
-        :verify_ssl      => OpenSSL::SSL::VERIFY_PEER,
-      }
     end
 
     def parse_response(response)
