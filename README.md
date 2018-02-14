@@ -21,7 +21,19 @@ require 'etre-client'
 
 Create a new client
 ```
-e = Etre::Client.new(entity_type: "node", url: "http://127.0.0.1:8080", ssl_cert: nil, ssl_key: nil, ssl_ca: nil, insecure: true)
+# Create a standard client.
+e = Etre::Client.new(entity_type: "node", url: "http://127.0.0.1:8080")
+
+# Create a client with advanced HTTP options. These are passed down to the rest-client within the Etre Client.
+# See https://github.com/rest-client/rest-client#passing-advanced-options for more details.
+options = {
+  :ssl_client_cert => OpenSSL::X509::Certificate.new(File.read("path_to_ssl_cert")),
+  :ssl_client_key  => OpenSSL::PKey::RSA.new(File.read("path_to_ssl_key")),
+  :ssl_ca_file     => "path_to_ssl_ca",
+  :verify_ssl      => OpenSSL::SSL::VERIFY_PEER,
+  :cookies         => {:foo => "bar"},
+}
+e = Etre::Client.new(entity_type: "node", url: "http://127.0.0.1:8080", options: options)
 ```
 
 Insert entities

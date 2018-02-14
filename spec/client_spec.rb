@@ -2,7 +2,7 @@ require 'etre-client'
 require 'ostruct'
 
 describe Etre::Client do
-  let(:etre_client) { Etre::Client.new(entity_type: "node", url: "http://localhost:3000", insecure: true) }
+  let(:etre_client) { Etre::Client.new(entity_type: "node", url: "http://localhost:3000") }
   let(:get_headers) { {:accept => "application/json"} }
   let(:post_headers) { get_headers.merge({:content_type => "application/json"}) }
   let(:put_headers) { post_headers }
