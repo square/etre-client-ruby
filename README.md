@@ -102,6 +102,11 @@ Run the tests
 bundle exec rake spec
 ```
 
+Publish a new version of the gem:
+1. Bump the version in lib/etre-client/version.rb
+2. Build the gem with `gem build etre-client.gemspec`
+3. Publish the new gem with `gem push etre-client-#{GEM_VERSION}.gem`
+
 ## License
 
 Copyright (c) 2017 Square Inc. Distributed under the Apache 2.0 License.
