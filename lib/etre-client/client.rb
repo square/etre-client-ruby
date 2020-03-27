@@ -1,4 +1,5 @@
 require 'etre-client/errors'
+require 'logger'
 require 'rest-client'
 require 'json'
 
@@ -10,10 +11,14 @@ module Etre
     META_LABEL_ID = "_id"
     META_LABEL_TYPE = "_type"
 
-    def initialize(entity_type:, url:, options: {})
+    def initialize(entity_type:, url:, retry_count: 0, retry_wait: 1, options: {})
       @entity_type = entity_type
       @url = url
+      @retry_count = retry_count # retry count on network or API error
+      @retry_wait = retry_wait # wait time between retries
       @options = options
+
+      @logger = Logger.new(STDOUT)
     end
 
     # query returns an array of entities that satisfy a query.
@@ -236,29 +241,37 @@ module Etre
     private
 
     def etre_get(route)
-      resource_for_route(route).get(
-        get_headers,
-      )
+      rest_retry {
+        resource_for_route(route).get(
+          get_headers,
+        )
+      }
     end
 
     def etre_post(route, params = nil)
-      resource_for_route(route).post(
-        params.to_json,
-        post_headers,
-      )
+      rest_retry {
+        resource_for_route(route).post(
+          params.to_json,
+          post_headers,
+        )
+      }
     end
 
     def etre_put(route, params = nil)
-      resource_for_route(route).put(
-        params.to_json,
-        put_headers,
-      )
+      rest_retry {
+        resource_for_route(route).put(
+          params.to_json,
+          put_headers,
+        )
+      }
     end
 
     def etre_delete(route)
-      resource_for_route(route).delete(
-        delete_headers,
-      )
+      rest_retry {
+        resource_for_route(route).delete(
+          delete_headers,
+        )
+      }
     end
 
     def get_headers
@@ -286,6 +299,22 @@ module Etre
 
     def parse_response(response)
       JSON.parse(response)
+    end
+
+    def rest_retry(&block)
+      retries = 0
+
+      begin
+        yield
+      rescue => e
+        if (retries += 1) <= @retry_count
+          @logger.warn("Error querying etre (#{e}). Sleeping for #{@retry_wait} seconds before trying again (attmept #{retries}/#{@retry_count}).")
+          sleep(@retry_wait)
+          retry
+        else
+          raise
+        end
+      end
     end
   end
 end
