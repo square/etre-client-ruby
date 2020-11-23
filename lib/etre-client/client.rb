@@ -10,12 +10,14 @@ module Etre
     API_ROOT = "/api/v1"
     META_LABEL_ID = "_id"
     META_LABEL_TYPE = "_type"
+    QUERY_TIMEOUT_HEADER = "X-Etre-Query-Timeout"
 
-    def initialize(entity_type:, url:, retry_count: 0, retry_wait: 1, options: {})
+    def initialize(entity_type:, url:, query_timeout: 5, retry_count: 0, retry_wait: 1, options: {})
       @entity_type = entity_type
       @url = url
+      @query_timeout = query_timeout # http request timeout in seconds
       @retry_count = retry_count # retry count on network or API error
-      @retry_wait = retry_wait # wait time between retries
+      @retry_wait = retry_wait # wait time between retries in seconds
       @options = options
 
       @logger = Logger.new(STDOUT)
@@ -275,7 +277,10 @@ module Etre
     end
 
     def get_headers
-      {:accept => 'application/json'}
+      {
+          :accept => 'application/json',
+          :x_etre_query_timeout => @query_timeout
+      }
     end
 
     def post_headers
