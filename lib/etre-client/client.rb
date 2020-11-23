@@ -10,7 +10,6 @@ module Etre
     API_ROOT = "/api/v1"
     META_LABEL_ID = "_id"
     META_LABEL_TYPE = "_type"
-    QUERY_TIMEOUT_HEADER = "X-Etre-Query-Timeout"
 
     def initialize(entity_type:, url:, query_timeout: 5, retry_count: 0, retry_wait: 1, options: {})
       @entity_type = entity_type
