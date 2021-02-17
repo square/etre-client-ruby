@@ -11,7 +11,7 @@ module Etre
     META_LABEL_ID = "_id"
     META_LABEL_TYPE = "_type"
 
-    def initialize(entity_type:, url:, query_timeout: 5, retry_count: 0, retry_wait: 1, options: {})
+    def initialize(entity_type:, url:, query_timeout: '5s', retry_count: 0, retry_wait: 1, options: {})
       @entity_type = entity_type
       @url = url
       @query_timeout = query_timeout # http request timeout in seconds
